@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Events & Tickets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .page-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Device Shell */
+    .iphone-frame {
+      position: relative;
+      width: 380px;
+      height: 780px;
+      background-color: #000;
+      border-radius: 50px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 0 10px #2d2d2d;
+      overflow: hidden;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 26px;
+      background-color: #000;
+      border-radius: 20px;
+      z-index: 999;
+    }
+
+    .iphone-screen {
+      width: 100%;
+      height: 100%;
+      background-color: #0d121d;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Page Visibility States */
+    .app-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hidden-page {
+      display: none !important;
+    }
+
+    .active-page {
+      display: flex !important;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 40px;
+      padding: 10px 20px 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      color: #fff;
+      background-color: #0d121d;
+      flex-shrink: 0;
+    }
+
+    .close-icon {
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .help-text {
+      font-size: 0.9rem;
+      color: #2563eb;
+      cursor: pointer;
+    }
+
+    /* Sub-tabs */
+    .sub-tabs {
+      display: flex;
+      border-bottom: 1px solid #1e293b;
+      background-color: #0d121d;
+      flex-shrink: 0;
+    }
+
+    .sub-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.5px;
+    }
+
+    .sub-tab.active {
+      color: #ffffff;
+      border-bottom: 2px solid #ffffff;
+    }
+
+    /* Main Scroll Area */
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-color: #f1f5f9;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      min-height: 0;
+    }
+
+    .scroll-content.light-bg {
+      background-color: #ffffff;
+      padding: 16px 12px;
+    }
+
+    .scroll-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ================= MY EVENTS PAGE STYLES ================= */
+    .event-card {
+      background-color: #121212;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.15s ease;
+    }
+
+    .event-card:active {
+      transform: scale(0.98);
+    }
+
+    .event-image-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+    }
+
+    .event-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .date-badge {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: #121212;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .event-info {
+      padding: 16px 12px 12px 12px;
+      color: #ffffff;
+    }
+
+    .event-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .event-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #a1a1aa;
+    }
+
+    .ticket-count {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* ================= MY TICKETS PAGE STYLES ================= */
+    .tickets-slider {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-top: 14px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .tickets-slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ticket-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      padding: 0 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .ticket-card {
+      position: relative;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding-bottom: 4px;
+    }
+
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px 6px 14px;
+      font-size: 0.75rem;
+      color: #ffffff;
+      background-color: #1d4ed8;
+    }
+
+    .info-icon {
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    .seat-numbers {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 10px 16px 10px;
+      text-align: center;
+      background-color: #1d4ed8;
+    }
+
+    .seat-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lbl {
+      font-size: 0.65rem;
+      color: #bfdbfe;
+      font-weight: 700;
+    }
+
+    .val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .card-image-banner {
+      position: relative;
+      height: 140px;
+      width: 100%;
+    }
+
+    .banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .banner-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
+      text-align: center;
+    }
+
+    .banner-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .banner-subtitle {
+      font-size: 0.7rem;
+      color: #cbd5e1;
+    }
+
+    .card-actions {
+      background-color: #ffffff;
+      padding: 16px 16px 0 16px;
+      text-align: center;
+      color: #1e293b;
+    }
+
+    .ticket-type-label {
+      display: block;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .view-ticket-btn {
+      width: 100%;
+      background-color: #111827;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .ticket-details-link {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0f172a;
+      cursor: pointer;
+    }
+
+    .card-bottom-line {
+      width: calc(100% - 24px);
+      height: 1px;
+      background-color: #1d4ed8;
+      margin: 12px auto 0 auto;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 10px 0;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background-color: #cbd5e1;
+      border-radius: 50%;
+      transition: all 0.25s ease-in-out;
+    }
+
+    .dot.active {
+      background-color: #334155;
+      transform: scale(1.3);
+    }
+
+    .static-buttons-wrapper {
+      padding: 0 14px;
+      margin-bottom: 14px;
+    }
+
+    .action-buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-blue-action {
+      flex: 1;
+      background-color: #1d4ed8;
+      color: #fff;
+      border: none;
+      padding: 10px 0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-outline-action {
+      flex: 1;
+      background-color: #cbd5e1;
+      color: #ffffff;
+      border: none;
+      padding: 10px 0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .btn-outline-action.disabled {
+      cursor: not-allowed;
+    }
+
+    .map-preview-container {
+      position: relative;
+      height: 180px;
+      width: calc(100% - 28px);
+      margin: 0 auto 20px auto;
+      overflow: hidden;
+      border-radius: 16px;
+      background-color: #0f172a;
+    }
+
+    .map-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-tag-overlay {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      z-index: 10;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      text-shadow: 
+        0px 2px 4px rgba(0, 0, 0, 0.75),
+        0px 4px 10px rgba(0, 0, 0, 0.5),
+        0px 0px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ================= PAGE 3: FULLSCREEN BARCODE MODAL ================= */
+    .barcode-modal {
+      background-color: #000;
+      position: relative;
+      color: #ffffff;
+    }
+
+    .barcode-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 20;
+    }
+
+    .close-barcode {
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #ffffff;
+    }
+
+    .barcode-header-center {
+      text-align: center;
+    }
+
+    .barcode-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .barcode-subtitle {
+      font-size: 0.65rem;
+      color: #94a3b8;
+    }
+
+    .help-text-light {
+      font-size: 0.85rem;
+      color: #ffffff;
+    }
+
+    .barcode-body {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 30px;
+      overflow: hidden;
+    }
+
+    .barcode-bg-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(2px);
+    }
+
+    .barcode-overlay-dark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.65);
+    }
+
+    .barcode-content-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .presale-heading {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
+
+    .barcode-seats {
+      display: flex;
+      gap: 48px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .b-seat-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .b-lbl {
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .b-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    /* Barcode Box */
+    .barcode-box {
+      background-color: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      margin-bottom: 28px;
+    }
+
+    .barcode-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 85px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      padding: 4px 0;
+    }
+
+    .real-barcode-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .laser-scanner-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 3px;
+      background-color: #2563eb;
+      box-shadow: 0 0 12px #2563eb, 0 0 6px #3b82f6;
+      animation: scanAnimation 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+      z-index: 5;
+    }
+
+    @keyframes scanAnimation {
+      0% {
+        left: 0%;
+      }
+      100% {
+        left: 98%;
+      }
+    }
+
+    .barcode-warning {
+      color: #000;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    /* Apple Wallet Button & Icon */
+    .apple-wallet-btn {
+      width: 75%;
+      max-width: 250px;
+      background-color: #000000;
+      border: 1px solid #333333;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .apple-wallet-icon {
+      position: relative;
+      width: 26px;
+      height: 20px;
+      background-color: #f3f4f6;
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .card-layer {
+      width: 100%;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .c-green {
+      height: 4px;
+      background-color: #34d399;
+    }
+
+    .c-yellow {
+      height: 4px;
+      background-color: #f59e0b;
+    }
+
+    .c-blue {
+      height: 4px;
+      background-color: #3b82f6;
+    }
+
+    .c-red {
+      height: 8px;
+      background-color: #ef4444;
+      position: relative;
+    }
+
+    .c-red::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 3px;
+      background-color: #ffffff;
+      border-radius: 2px;
+    }
+
+    .mobile-ticket-tag {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    /* ================= TRANSFER BOTTOM SHEET STYLES ================= */
+    .transfer-sheet-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 500;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .transfer-sheet-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .transfer-sheet {
+      width: 100%;
+      background-color: #ffffff;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      max-height: 52%;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .transfer-sheet-overlay.open .transfer-sheet {
+      transform: translateY(0);
+    }
+
+    .transfer-sheet-header {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #000000;
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
+    }
+
+    .transfer-sheet-close {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #000;
+    }
+
+    .transfer-notice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background-color: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .transfer-notice-icon {
+      width: 28px;
+      height: 28px;
+      background-color: #64748b;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .transfer-notice-text {
+      font-size: 0.8rem;
+      color: #1e293b;
+      line-height: 1.3;
+      font-weight: 500;
+    }
+
+    .transfer-body-content {
+      padding: 16px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .transfer-section-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .transfer-section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .transfer-ticket-count-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .transfer-seats-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 10px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .transfer-seats-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .transfer-seat-card {
+      flex: 0 0 64px;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+    }
+
+    .transfer-seat-card.selected {
+      border-color: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .transfer-seat-card-header {
+      background-color: #2563eb;
+      color: #ffffff;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 5px 0;
+      letter-spacing: 0.2px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .transfer-seat-card:not(.selected) .transfer-seat-card-header {
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+
+    .transfer-seat-card-body {
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+    }
+
+    .custom-radio {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      transition: all 0.2s;
+    }
+
+    .transfer-seat-card.selected .custom-radio {
+      border-color: #2563eb;
+      background-color: #2563eb;
+    }
+
+    .transfer-seat-card.selected .custom-radio::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background-color: #ffffff;
+      border-radius: 50%;
+    }
+
+    .transfer-sheet-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+      background-color: #ffffff;
+    }
+
+    .selected-count-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #000000;
+    }
+
+    .transfer-to-btn {
+      background-color: transparent;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #94a3b8;
+      cursor: not-allowed;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+
+    .transfer-to-btn.active {
+      color: #2563eb;
+      cursor: pointer;
+    }
+
+    /* ================= SUB-SHEET 2: RECIPIENT DETAILS STYLES ================= */
+    .recipient-sheet-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #ffffff;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      z-index: 600;
+      display: flex;
+      flex-direction: column;
+      max-height: 52%;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .recipient-sheet-wrapper.open {
+      transform: translateY(0);
+    }
+
+    .recipient-sheet-header {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #000000;
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
+      background-color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .recipient-sheet-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      padding: 16px;
+      background-color: #ffffff;
+    }
+
+    .recipient-sheet-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .recipient-summary-box {
+      margin-bottom: 14px;
+    }
+
+    .recipient-tickets-selected-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+
+    .recipient-tickets-seats-subtitle {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .recipient-form-group {
+      margin-bottom: 12px;
+    }
+
+    .recipient-form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .recipient-form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #1f2937;
+      background-color: #e5e7eb;
+      outline: none;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .recipient-form-input:focus {
+      border-color: #2563eb;
+      background-color: #f3f4f6;
+    }
+
+    .recipient-form-input::placeholder {
+      color: #4b5563;
+      font-weight: 400;
+    }
+
+    textarea.recipient-form-input {
+      resize: vertical;
+      min-height: 90px;
+      font-family: inherit;
+    }
+
+    .recipient-sheet-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .recipient-back-btn {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2563eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .recipient-submit-btn {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      padding: 8px 0 16px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.65rem;
+      color: #64748b;
+      gap: 2px;
+    }
+
+    .nav-item i {
+      font-size: 1rem;
+    }
+
+    .nav-item.active {
+      color: #0284c7;
+    }
+
+    /* Home Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background-color: #fff;
+      border-radius: 2px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrapper">
+    <div class="iphone-frame">
+      <div class="dynamic-island"></div>
+
+      <div class="iphone-screen">
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span class="time">00:25</span>
+          <div class="status-icons">
+            <i class="fa-solid fa-signal"></i>
+            <i class="fa-solid fa-wifi"></i>
+            <span class="battery-icon"><i class="fa-solid fa-battery-three-quarters"></i> 29</span>
+          </div>
+        </div>
+
+        <!-- PAGE 1: MY EVENTS -->
+        <div id="eventsPage" class="app-page active-page">
+          <header class="app-header">
+            <div style="width: 20px;"></div>
+            <h1 class="header-title">My Events</h1>
+            <span class="help-text">Help</span>
+          </header>
+
+          <div class="sub-tabs">
+            <div class="sub-tab active">UPCOMING (1)</div>
+            <div class="sub-tab">PAST (0)</div>
+          </div>
+
+          <div class="scroll-content light-bg">
+            <div class="event-card" id="eventCard">
+              <div class="event-image-container">
+                <img src="bts-header.jpg" alt="BTS WORLD TOUR 'ARIRANG' IN ARLINGTON" class="event-img">
+                <div class="date-badge">SAT, AUG 15, 8:29 PM</div>
+              </div>
+              <div class="event-info">
+                <h2 class="event-title">BTS WORLD TOUR 'ARIRANG' IN ARLINGTON</h2>
+                <div class="event-footer">
+                  <span class="event-location">AT&amp;T Stadium</span>
+                  <div class="ticket-count">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>x2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 2: MY TICKETS -->
+        <div id="ticketsPage" class="app-page hidden-page">
+          <header class="app-header">
+            <i class="fa-solid fa-xmark close-icon" id="closeTicketsBtn"></i>
+            <h1 class="header-title">My Tickets</h1>
+            <span class="help-text">Help</span>
+          </header>
+
+          <div class="sub-tabs">
+            <div class="sub-tab active">MY TICKETS</div>
+            <div class="sub-tab">ADD-ONS</div>
+          </div>
+
+          <div class="scroll-content">
+            <div class="tickets-slider" id="ticketsSlider">
+              
+              <!-- Slide 1 (Seat 3) -->
+              <div class="ticket-slide">
+                <div class="ticket-card">
+                  <div class="card-top-bar">
+                    <span>Mobile Ticket</span>
+                    <i class="fa-regular fa-circle-question info-icon"></i>
+                  </div>
+                  <div class="seat-numbers">
+                    <div class="seat-col"><span class="lbl">SEC</span><span class="val" style="font-size: 1.2rem;">FLR6</span></div>
+                    <div class="seat-col"><span class="lbl">ROW</span><span class="val">4</span></div>
+                    <div class="seat-col"><span class="lbl">SEAT</span><span class="val" style="font-size: 1.2rem;">3</span></div>
+                  </div>
+                  <div class="card-image-banner">
+                    <img src="bts-header.jpg" alt="BTS WORLD TOUR 'ARIRANG' IN ARLINGTON" class="banner-img">
+                    <div class="banner-overlay">
+                      <h2 class="banner-title">BTS WORLD TOUR 'ARIRANG' IN ARLINGTON</h2>
+                      <p class="banner-subtitle">Sat, Aug 15, 8:29 PM • AT&amp;T Stadium</p>
+                    </div>
+                  </div>
+                  <div class="card-actions">
+                    <span class="ticket-type-label">VIP SOUNDCHECK PACKAGE</span>
+                    <button class="view-ticket-btn" data-seat="3">
+                      <i class="fa-solid fa-barcode"></i>
+                      <span>View Ticket</span>
+                    </button>
+                    <div class="ticket-details-link"><span>Ticket Details</span></div>
+                  </div>
+                  <div class="card-bottom-line"></div>
+                </div>
+              </div>
+
+              <!-- Slide 2 (Seat 4) -->
+              <div class="ticket-slide">
+                <div class="ticket-card">
+                  <div class="card-top-bar">
+                    <span>Mobile Ticket</span>
+                    <i class="fa-regular fa-circle-question info-icon"></i>
+                  </div>
+                  <div class="seat-numbers">
+                    <div class="seat-col"><span class="lbl">SEC</span><span class="val" style="font-size: 1.2rem;">FLR6</span></div>
+                    <div class="seat-col"><span class="lbl">ROW</span><span class="val">4</span></div>
+                    <div class="seat-col"><span class="lbl">SEAT</span><span class="val" style="font-size: 1.2rem;">4</span></div>
+                  </div>
+                  <div class="card-image-banner">
+                    <img src="bts-header.jpg" alt="BTS WORLD TOUR 'ARIRANG' IN ARLINGTON" class="banner-img">
+                    <div class="banner-overlay">
+                      <h2 class="banner-title">BTS WORLD TOUR 'ARIRANG' IN ARLINGTON</h2>
+                      <p class="banner-subtitle">Sat, Aug 15, 8:29 PM • AT&amp;T Stadium</p>
+                    </div>
+                  </div>
+                  <div class="card-actions">
+                    <span class="ticket-type-label">VIP SOUNDCHECK PACKAGE</span>
+                    <button class="view-ticket-btn" data-seat="4">
+                      <i class="fa-solid fa-barcode"></i>
+                      <span>View Ticket</span>
+                    </button>
+                    <div class="ticket-details-link"><span>Ticket Details</span></div>
+                  </div>
+                  <div class="card-bottom-line"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="carousel-dots" id="carouselDots">
+              <span class="dot active"></span>
+              <span class="dot"></span>
+            </div>
+
+            <div class="static-buttons-wrapper">
+              <div class="action-buttons-row">
+                <button class="btn-blue-action" id="transferBtn">Transfer</button>
+                <button class="btn-outline-action disabled">Sell</button>
+                <button class="btn-blue-action">Orders</button>
+              </div>
+            </div>
+
+            <div class="map-preview-container">
+              <div class="map-tag-overlay">AT&amp;T Stadium</div>
+              <img src="new-map.png" alt="Map View" class="map-img">
+            </div>
+
+          </div>
+
+          <!-- TRANSFER BOTTOM SHEET OVERLAY -->
+          <div class="transfer-sheet-overlay" id="transferSheetOverlay">
+            <div class="transfer-sheet" id="transferSheet">
+              <div class="transfer-sheet-header">
+                <i class="fa-solid fa-xmark transfer-sheet-close" id="closeTransferSheet"></i>
+                SELECT TICKETS TO TRANSFER
+              </div>
+              <div class="transfer-notice">
+                <div class="transfer-notice-icon">
+                  <i class="fa-solid fa-info"></i>
+                </div>
+                <div class="transfer-notice-text">
+                  Only transfer tickets to people you know and trust to ensure everyone stays safe
+                </div>
+              </div>
+              <div class="transfer-body-content">
+                <div class="transfer-section-header-row">
+                  <div class="transfer-section-title">Sec FLR6, Row 4</div>
+                  <div class="transfer-ticket-count-label">
+                    <i class="fa-solid fa-ticket" style="font-size: 0.8rem;"></i>
+                    <span>2 tickets</span>
+                  </div>
+                </div>
+                <div class="transfer-seats-grid">
+                  <div class="transfer-seat-card selected" data-seat-id="3">
+                    <div class="transfer-seat-card-header">SEAT 3</div>
+                    <div class="transfer-seat-card-body">
+                      <div class="custom-radio"></div>
+                    </div>
+                  </div>
+                  <div class="transfer-seat-card selected" data-seat-id="4">
+                    <div class="transfer-seat-card-header">SEAT 4</div>
+                    <div class="transfer-seat-card-body">
+                      <div class="custom-radio"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="transfer-sheet-footer">
+                <span class="selected-count-text" id="selectedCountText">2 Selected</span>
+                <button class="transfer-to-btn active" id="transferToBtn">
+                  <span>TRANSFER TO</span>
+                  <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- SUB-SHEET 2: RECIPIENT DETAILS FORM -->
+            <div class="recipient-sheet-wrapper" id="recipientSheetWrapper">
+              <div class="recipient-sheet-header">
+                TRANSFER TICKETS
+              </div>
+              <div class="recipient-sheet-body">
+                <div class="recipient-summary-box">
+                  <div class="recipient-tickets-selected-title" id="recipientCountDisplay">2 Tickets Selected</div>
+                  <div class="recipient-tickets-seats-subtitle" id="recipientSeatsDisplay">Sec FLR6 Row 4 Seat 3, 4</div>
+                </div>
+                
+                <div class="recipient-form-group">
+                  <label class="recipient-form-label">First Name</label>
+                  <input type="text" class="recipient-form-input" placeholder="First Name">
+                </div>
+
+                <div class="recipient-form-group">
+                  <label class="recipient-form-label">Last Name</label>
+                  <input type="text" class="recipient-form-input" placeholder="Last Name">
+                </div>
+
+                <div class="recipient-form-group">
+                  <label class="recipient-form-label">Email or Mobile Number</label>
+                  <input type="text" class="recipient-form-input" placeholder="Email or Mobile Number">
+                </div>
+
+                <div class="recipient-form-group">
+                  <label class="recipient-form-label">Note</label>
+                  <textarea class="recipient-form-input" placeholder="Note"></textarea>
+                </div>
+              </div>
+              <div class="recipient-sheet-footer">
+                <button class="recipient-back-btn" id="recipientBackBtn">
+                  <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+                  <span>BACK</span>
+                </button>
+                <button class="recipient-submit-btn" id="recipientSubmitBtn">TRANSFER 2 TICKETS</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PAGE 3: FULLSCREEN BARCODE MODAL -->
+        <div id="barcodePage" class="app-page hidden-page barcode-modal">
+          <header class="barcode-header">
+            <i class="fa-solid fa-xmark close-barcode" id="closeBarcodeBtn"></i>
+            <div class="barcode-header-center">
+              <h1 class="barcode-title">BTS WORLD TOUR 'ARIRANG' IN ARLINGTON</h1>
+              <p class="barcode-subtitle">Sat, Aug 15, 2026, 8:29 PM - AT&amp;T Stadium</p>
+            </div>
+            <span class="help-text-light">Help</span>
+          </header>
+
+          <div class="barcode-body">
+            <img src="bts-header.jpg" alt="Background" class="barcode-bg-img">
+            <div class="barcode-overlay-dark"></div>
+
+            <div class="barcode-content-wrapper">
+              <h2 class="presale-heading">Mobile Ticket</h2>
+
+              <div class="barcode-seats">
+                <div class="b-seat-col"><span class="b-lbl">SEC</span><span class="b-val" style="font-size: 1.2rem;">FLR6</span></div>
+                <div class="b-seat-col"><span class="b-lbl">ROW</span><span class="b-val">4</span></div>
+                <div class="b-seat-col"><span class="b-lbl">SEAT</span><span class="b-val" id="activeSeatNum" style="font-size: 1.3rem;">3</span></div>
+              </div>
+
+              <!-- Barcode Box -->
+              <div class="barcode-box">
+                <div class="barcode-image-wrapper">
+                  <img src="barcode.png" alt="Ticket Barcode" class="real-barcode-img">
+                  <div class="laser-scanner-line"></div>
+                </div>
+                <div class="barcode-warning">Screenshots won't get you in</div>
+              </div>
+
+              <!-- Apple Wallet Button -->
+              <button class="apple-wallet-btn">
+                <div class="apple-wallet-icon">
+                  <div class="card-layer c-green"></div>
+                  <div class="card-layer c-yellow"></div>
+                  <div class="card-layer c-blue"></div>
+                  <div class="card-layer c-red"></div>
+                </div>
+                <span>Add to Apple Wallet</span>
+              </button>
+
+              <div class="mobile-ticket-tag">Mobile Ticket</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav" id="bottomNav">
+          <div class="nav-item">
+            <i class="fa-solid fa-compass"></i>
+            <span>Discover</span>
+          </div>
+          <div class="nav-item">
+            <i class="fa-regular fa-heart"></i>
+            <span>Favorites</span>
+          </div>
+          <div class="nav-item active">
+            <i class="fa-solid fa-ticket"></i>
+            <span>My Tickets</span>
+          </div>
+          <div class="nav-item">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Sell</span>
+          </div>
+          <div class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>My Account</span>
+          </div>
+        </nav>
+
+        <div class="home-indicator"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const eventsPage = document.getElementById('eventsPage');
+    const ticketsPage = document.getElementById('ticketsPage');
+    const barcodePage = document.getElementById('barcodePage');
+    
+    const eventCard = document.getElementById('eventCard');
+    const closeTicketsBtn = document.getElementById('closeTicketsBtn');
+    const closeBarcodeBtn = document.getElementById('closeBarcodeBtn');
+    const bottomNav = document.getElementById('bottomNav');
+    const viewTicketBtns = document.querySelectorAll('.view-ticket-btn');
+    const activeSeatNum = document.getElementById('activeSeatNum');
+
+    // Transfer Sheet Elements
+    const transferBtn = document.getElementById('transferBtn');
+    const transferSheetOverlay = document.getElementById('transferSheetOverlay');
+    const transferSheet = document.getElementById('transferSheet');
+    const closeTransferSheet = document.getElementById('closeTransferSheet');
+    const transferSeatCards = document.querySelectorAll('.transfer-seat-card');
+    const selectedCountText = document.getElementById('selectedCountText');
+    const transferToBtn = document.getElementById('transferToBtn');
+
+    // Recipient Sheet Elements
+    const recipientSheetWrapper = document.getElementById('recipientSheetWrapper');
+    const recipientBackBtn = document.getElementById('recipientBackBtn');
+    const recipientCountDisplay = document.getElementById('recipientCountDisplay');
+    const recipientSeatsDisplay = document.getElementById('recipientSeatsDisplay');
+    const recipientSubmitBtn = document.getElementById('recipientSubmitBtn');
+
+    // Open Tickets Page
+    eventCard.addEventListener('click', () => {
+      eventsPage.classList.remove('active-page');
+      eventsPage.classList.add('hidden-page');
+      
+      ticketsPage.classList.remove('hidden-page');
+      ticketsPage.classList.add('active-page');
+
+      bottomNav.style.display = 'none';
+    });
+
+    // Close Tickets Page
+    closeTicketsBtn.addEventListener('click', () => {
+      ticketsPage.classList.remove('active-page');
+      ticketsPage.classList.add('hidden-page');
+      
+      eventsPage.classList.remove('hidden-page');
+      eventsPage.classList.add('active-page');
+
+      bottomNav.style.display = 'flex';
+    });
+
+    // Open Barcode Modal
+    viewTicketBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const structuralSeatNumber = e.currentTarget.getAttribute('data-seat');
+        activeSeatNum.textContent = structuralSeatNumber;
+
+        ticketsPage.classList.remove('active-page');
+        ticketsPage.classList.add('hidden-page');
+
+        barcodePage.classList.remove('hidden-page');
+        barcodePage.classList.add('active-page');
+      });
+    });
+
+    // Close Barcode Modal
+    closeBarcodeBtn.addEventListener('click', () => {
+      barcodePage.classList.remove('active-page');
+      barcodePage.classList.add('hidden-page');
+
+      ticketsPage.classList.remove('hidden-page');
+      ticketsPage.classList.add('active-page');
+    });
+
+    // Transfer Sheet Logic
+    transferBtn.addEventListener('click', () => {
+      transferSheetOverlay.classList.add('open');
+      recipientSheetWrapper.classList.remove('open');
+      transferSheet.style.display = 'flex';
+    });
+
+    closeTransferSheet.addEventListener('click', () => {
+      transferSheetOverlay.classList.remove('open');
+    });
+
+    transferSheetOverlay.addEventListener('click', (e) => {
+      if (e.target === transferSheetOverlay) {
+        transferSheetOverlay.classList.remove('open');
+      }
+    });
+
+    // Toggle Seat Selection in Transfer Sheet
+    transferSeatCards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        updateTransferSelectionState();
+      });
+    });
+
+    function updateTransferSelectionState() {
+      const selectedCards = document.querySelectorAll('.transfer-seat-card.selected');
+      const count = selectedCards.length;
+
+      selectedCountText.textContent = `${count} Selected`;
+
+      if (count > 0) {
+        transferToBtn.classList.add('active');
+      } else {
+        transferToBtn.classList.remove('active');
+      }
+    }
+
+    // Transition to Recipient Details Form
+    transferToBtn.addEventListener('click', () => {
+      if (!transferToBtn.classList.contains('active')) return;
+
+      const selectedCards = document.querySelectorAll('.transfer-seat-card.selected');
+      const count = selectedCards.length;
+      const seatNums = Array.from(selectedCards).map(c => c.getAttribute('data-seat-id')).join(', ');
+
+      recipientCountDisplay.textContent = `${count} Ticket${count > 1 ? 's' : ''} Selected`;
+      recipientSeatsDisplay.textContent = `Sec FLR6 Row 4 Seat ${seatNums}`;
+      recipientSubmitBtn.textContent = `TRANSFER ${count} TICKET${count > 1 ? 'S' : ''}`;
+
+      transferSheet.style.display = 'none';
+      recipientSheetWrapper.classList.add('open');
+    });
+
+    // Back from Recipient Form to Seat Selector
+    recipientBackBtn.addEventListener('click', () => {
+      recipientSheetWrapper.classList.remove('open');
+      transferSheet.style.display = 'flex';
+    });
+
+    // Carousel Dot Tracking
+    const slider = document.getElementById('ticketsSlider');
+    const slides = document.querySelectorAll('.ticket-slide');
+    const dots = document.querySelectorAll('.dot');
+
+    slider.addEventListener('scroll', () => {
+      const slideWidth = slides[0].clientWidth;
+      const currentIndex = Math.round(slider.scrollLeft / slideWidth);
+
+      dots.forEach((dot, index) => {
+        if (index === currentIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
